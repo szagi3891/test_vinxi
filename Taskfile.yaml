@@ -1,0 +1,24 @@
+version: "3"
+
+tasks:
+  dev:
+    desc: Uruchamia serwer deweloperski (HMR)
+    cmds:
+      - ./node_modules/.bin/vinxi dev
+    interactive: true
+
+  build:
+    desc: Buduje projekt do produkcji
+    cmds:
+      - ./node_modules/.bin/vinxi build
+
+  start:
+    desc: Uruchamia zbudowaną aplikację (wymaga wcześniejszego build)
+    cmds:
+      - ./node_modules/.bin/vinxi start
+    interactive: true
+
+  typecheck:
+    desc: Sprawdza typy TypeScript w całym projekcie
+    cmds:
+      - ./node_modules/.bin/tsc --noEmit
