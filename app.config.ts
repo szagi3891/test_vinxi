@@ -2,6 +2,11 @@ import reactRefresh from "@vitejs/plugin-react";
 import { createApp } from "vinxi";
 
 export default createApp({
+  // Nitro: bundluj zależności serwera do jednego index.mjs zamiast kopiować node_modules/ do .output/server/
+  server: {
+    noExternals: true, // react, vinxi itd. trafiają do bundla, nie obok jako osobne pakiety
+    inlineDynamicImports: true, // jeden plik zamiast wielu chunków
+  },
   routers: [
     {
       name: "client",

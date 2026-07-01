@@ -15,6 +15,11 @@ type VinxiRouter = {
 
 declare module "vinxi" {
   export function createApp(config: {
+    server?: {
+      noExternals?: boolean;
+      inlineDynamicImports?: boolean;
+      output?: { dir?: string; serverDir?: string; publicDir?: string };
+    };
     routers?: VinxiRouter[];
   }): unknown;
 }

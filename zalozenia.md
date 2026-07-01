@@ -40,7 +40,16 @@ Brak routera stron, brak CSS frameworków, brak API, brak server functions.
 
 ## Routery (`app.config.ts`)
 
-Dwa routery — każdy z własnym grafem zależności Vite:
+Dwa routery — każdy z własnym grafem zależności Vite.
+
+Opcje Nitro (`server`) — bundling serwera do jednego pliku bez `node_modules` w output:
+
+```ts
+server: {
+  noExternals: true,           // zależności npm w index.mjs, nie w node_modules/
+  inlineDynamicImports: true,  // jeden plik zamiast chunków
+},
+```
 
 ### 1. `client` (browser)
 
@@ -117,13 +126,14 @@ Dynamiczny `import("./App")` po inicjalizacji preamble jest **celowy** — staty
 
 ---
 
-## Skrypty (`package.json`)
+## Komendy (`Taskfile.yaml`)
 
-```json
-"dev": "vinxi dev",
-"build": "vinxi build",
-"start": "vinxi start"
-```
+| Task | Opis |
+|------|------|
+| `task dev` | serwer deweloperski |
+| `task build` | build produkcyjny |
+| `task start` | uruchomienie po buildzie |
+| `task typecheck` | sprawdzenie typów TS |
 
 ---
 
@@ -137,12 +147,14 @@ Dynamiczny `import("./App")` po inicjalizacji preamble jest **celowy** — staty
 
 ## Build output (`.output/`)
 
-Po `vinxi build`:
+Po `task build`:
 
 | Ścieżka | Zawartość |
 |---------|-----------|
-| `.output/public/_build/` | Bundle klienta + manifest Vite (generowane przez Vinxi, nie z lokalnego katalogu `public/`) |
-| `.output/server/index.mjs` | Serwer Nitro (SSR + serwowanie assetów) |
+| `.output/public/_build/` | Bundle klienta + manifest Vite |
+| `.output/server/index.mjs` | Jeden plik serwera (React, vinxi, handler SSR — bez `node_modules/`) |
+
+Deploy produkcyjny: `index.mjs` + katalog `public/`.
 
 Pośrednie buildy per-router: `.vinxi/build/client/`, `.vinxi/build/ssr/`.
 
@@ -150,11 +162,11 @@ Pośrednie buildy per-router: `.vinxi/build/client/`, `.vinxi/build/ssr/`.
 
 ## Kryteria akceptacji
 
-- [ ] `npm run dev` — aplikacja na localhost, bez błędów w konsoli.
+- [ ] `task dev` — aplikacja na localhost, bez błędów w konsoli.
 - [ ] Odświeżenie strony zmienia znacznik czasu SSR.
 - [ ] Licznik działa po hydration (bez pełnego reload).
 - [ ] Edycja `App.tsx` w dev zachowuje stan licznika (HMR).
-- [ ] `npm run build && npm run start` — produkcja działa.
+- [ ] `task build && task start` — produkcja działa; `.output/server/` bez `node_modules/`.
 
 ---
 
