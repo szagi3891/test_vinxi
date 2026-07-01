@@ -4,27 +4,22 @@ import { getManifest } from "vinxi/manifest";
 import App from "./App";
 
 export default eventHandler(async (event) => {
-  const clientManifest = getManifest("client");
-  const clientHandler = clientManifest.inputs[clientManifest.handler];
-  const scriptSrc = clientHandler.output.path;
-  const serverRenderedAt = new Date().toISOString();
-  const manifestJson = await clientManifest.json();
+  const client = getManifest("client");
+  const scriptSrc = client.inputs[client.handler].output.path;
+  const manifestJson = await client.json();
 
-  const stream = await new Promise<
-    ReturnType<typeof renderToPipeableStream>
-  >((resolve) => {
-    const pipeableStream = renderToPipeableStream(
-      <App serverRenderedAt={serverRenderedAt} />,
+  event.node.res.setHeader("Content-Type", "text/html");
+
+  return new Promise((resolve) => {
+    const stream = renderToPipeableStream(
+      <App serverRenderedAt={new Date().toISOString()} />,
       {
-        onShellReady() {
-          resolve(pipeableStream);
-        },
         bootstrapModules: [scriptSrc],
         bootstrapScriptContent: `window.manifest = ${JSON.stringify(manifestJson)}`,
+        onShellReady() {
+          resolve(stream);
+        },
       },
     );
   });
-
-  event.node.res.setHeader("Content-Type", "text/html");
-  return stream;
 });
