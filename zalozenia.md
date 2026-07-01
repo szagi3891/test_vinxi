@@ -74,8 +74,8 @@ Handler musi:
 
 1. Użyć `eventHandler` z `vinxi/http`.
 2. Pobrać manifest klienta: `getManifest("client")` z `vinxi/manifest`.
-3. Wyrenderować `<App />` przez `renderToPipeableStream` (lub `renderToReadableStream`).
-4. Wstrzyknąć skrypt klienta przez `bootstrapModules: [scriptSrc]`, gdzie `scriptSrc` pochodzi z manifestu.
+3. Wyrenderować `<App />` przez `renderToString` (bez streamingu).
+4. Wstrzyknąć skrypt klienta ręcznie przed `</body>` — `scriptSrc` z manifestu + `window.manifest`.
 5. Ustawić `Content-Type: text/html` i zwrócić stream HTML.
 
 ### Co jest niezbędne (nie da się usunąć bez zmiany architektury)
@@ -83,19 +83,12 @@ Handler musi:
 | Element | Dlaczego |
 |---------|----------|
 | `getManifest("client")` + `scriptSrc` | Jedyny sposób, by SSR wiedział, który bundle załadować w przeglądarce |
-| `bootstrapModules` | React wstrzykuje `<script type="module">` z entry-client |
-| Callback `onShellReady` + `Promise` | API `renderToPipeableStream` jest oparte na callbackach — nie zwraca Promise |
-| `bootstrapScriptContent` (`window.manifest`) | Vinxi client runtime (`import "vinxi/client"`) oczekuje manifestu w `window` |
+| Ręczny `<script type="module" src="…">` przed `</body>` | `renderToString` nie wstrzykuje entry-client — bez tego brak hydration |
+| `window.manifest` | Opcjonalny w tym POC — potrzebny dopiero gdy klient używa `getManifest()` / `@vinxi/react` |
 
 ### Co można uprościć (bez zmiany założeń)
 
 - Skrócić nazwy zmiennych (`client` zamiast `clientManifest`).
-- Zamienić `renderToPipeableStream` + `Promise` na `renderToReadableStream` + `await` (krótszy kod, ten sam efekt — Vinxi obsługuje `ReadableStream`).
-- Wydzielić helper `getClientScriptSrc()` — mniej linii w handlerze, ale więcej plików.
-
-### Czego **nie** upraszczać do `renderToString`
-
-`renderToString` nie obsługuje `bootstrapModules` — trzeba by ręcznie sklejać tagi `<script>`, co jest bardziej kodu i bardziej podatne na błędy.
 
 ---
 
