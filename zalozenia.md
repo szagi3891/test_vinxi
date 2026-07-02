@@ -31,6 +31,7 @@ app.config.ts          # konfiguracja Vinxi (jedyne miejsce definicji routerów)
 src/
   entry-server.tsx     # handler HTTP — render SSR
   entry-client.tsx     # wejście przeglądarki — hydration
+  init-react-refresh.ts # dev: preamble React Refresh (v4 plugin — bez tego błąd MIME/HMR)
   App.tsx              # jedyny komponent aplikacji
 ```
 
@@ -94,19 +95,13 @@ Handler musi:
 
 ## `entry-client.tsx` — wymagania
 
-1. `import "vinxi/client"` — runtime manifestu Vinxi.
-2. `hydrateRoot(document, <App />)` — hydration pełnego dokumentu (`<html>` renderowany w `App.tsx`).
-3. **Dev only:** ręczna inicjalizacja React Refresh preamble przed importem komponentów.
+1. `import "./init-react-refresh"` — dev: React Refresh preamble (patrz niżej).
+2. `import "vinxi/client"` — runtime manifestu Vinxi.
+3. `hydrateRoot(document, <App />)` — hydration pełnego dokumentu.
 
-### Dlaczego preamble w dev?
+### Dlaczego `init-react-refresh.ts`?
 
-SSR streamuje HTML bez `transformIndexHtml` Vite. Plugin `@vitejs/plugin-react` normalnie wstrzykuje preamble tam — przy SSR trzeba to zrobić ręcznie w entry-client, inaczej błąd:
-
-```
-@vitejs/plugin-react can't detect preamble. Something is wrong.
-```
-
-Dynamiczny `import("./App")` po inicjalizacji preamble jest **celowy** — statyczny import byłby hoistowany i wykonałby się za wcześnie.
+SSR omija `transformIndexHtml` Vite. Używamy `@vitejs/plugin-react` **v4** (v6 nie współpracuje z Vite w Vinxi). Preamble inicjujemy ręcznie przed importem komponentów.
 
 ---
 
