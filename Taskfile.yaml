@@ -20,8 +20,10 @@ tasks:
 
   start-static:
     desc: Uruchamia build bezpośrednio przez Deno (wymaga wcześniejszego build)
+    env:
+      NODE_ENV: production
     cmds:
-      - sh -c 'NODE_ENV=production exec deno run -A .output/server/index.mjs'
+      - deno run -A .output/server/index.mjs
     interactive: true
 
   typecheck:
