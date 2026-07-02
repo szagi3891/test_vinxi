@@ -11,5 +11,5 @@
     "noEmit": true,
     "isolatedModules": true
   },
-  "include": ["src", "types", "app.config.ts"]
+  "include": ["src", "app.config.ts", "createApp.ts"]
 }

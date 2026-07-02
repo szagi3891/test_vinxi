@@ -1,5 +1,5 @@
 import reactRefresh from "@vitejs/plugin-react";
-import { createApp } from "vinxi";
+import { createApp } from "./createApp";
 
 const clientCacheDirPlugin = {
   name: "client-cache-dir",
