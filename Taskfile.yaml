@@ -4,18 +4,18 @@ tasks:
   dev:
     desc: Uruchamia serwer deweloperski (HMR)
     cmds:
-      - deno run -A npm:vinxi dev
+      - deno run -A npm:vinxi dev --config app.config.ts
     interactive: true
 
   build:
     desc: Buduje projekt do produkcji
     cmds:
-      - deno run -A npm:vinxi build
+      - deno run -A npm:vinxi build --config app.config.ts
 
   start:
     desc: Uruchamia zbudowaną aplikację (wymaga wcześniejszego build)
     cmds:
-      - deno run -A npm:vinxi start
+      - deno run -A npm:vinxi start --config app.config.ts
     interactive: true
 
   start-static:
