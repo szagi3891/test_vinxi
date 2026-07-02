@@ -7,6 +7,7 @@ type VinxiRouter = {
   name: string;
   type: string;
   handler?: string;
+  root?: string;
   target?: "browser" | "server" | "static";
   base?: string;
   dir?: string;

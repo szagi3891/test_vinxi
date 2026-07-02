@@ -29,8 +29,8 @@ Celem jest **najmniejszy możliwy setup**, który da się rozbudować — nie pr
 
 ```
 app.config.ts          # konfiguracja Vinxi (jedyne miejsce definicji routerów)
-index.html             # shell SPA — Vite wstrzykuje skrypty przez transformIndexHtml
 src/
+  index.html           # shell SPA — Vite wstrzykuje skrypty przez transformIndexHtml
   entry-api.ts         # handler HTTP — endpointy API
   entry-client.tsx     # wejście przeglądarki — createRoot
   App.tsx              # jedyny komponent aplikacji
@@ -64,6 +64,7 @@ server: {
 
 - `type: "spa"`
 - `handler: "./index.html"`
+- `root: "./src"`
 - `target: "browser"`
 - `base: "/"`
 - `plugins: () => [reactRefresh()]` — **jedyny** plugin w projekcie; odpowiada za HMR.
@@ -85,7 +86,7 @@ Przykład: `GET /api/health` → `{ status: "ok", time: "..." }`.
 
 ## `index.html` + `entry-client.tsx`
 
-- `index.html` — `<div id="root">` + `<script type="module" src="/src/entry-client.tsx">`.
+- `index.html` — `<div id="root">` + `<script type="module" src="./entry-client.tsx">`.
 - Vite w dev/prod wstrzykuje bundle i HMR przez `transformIndexHtml` — **brak ręcznego preamble**.
 - `entry-client.tsx` — `createRoot(document.getElementById("root")).render(<App />)`.
 

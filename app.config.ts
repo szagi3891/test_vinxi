@@ -17,6 +17,7 @@ export default createApp({
       name: "client",
       type: "spa",
       handler: "./index.html",
+      root: "./src",
       target: "browser",
       base: "/",
       plugins: () => [reactRefresh()],
