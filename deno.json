@@ -1,0 +1,25 @@
+{
+  "nodeModulesDir": "auto",
+  "imports": {
+    "react": "npm:react@^18.3.1",
+    "react/jsx-runtime": "npm:react@^18.3.1/jsx-runtime",
+    "react-dom": "npm:react-dom@^18.3.1",
+    "react-dom/client": "npm:react-dom@^18.3.1/client",
+    "mobx": "npm:mobx@^6.16.1",
+    "mobx-react": "npm:mobx-react@^9.2.2",
+    "vinxi": "npm:vinxi@^0.5.11",
+    "vinxi/http": "npm:vinxi@^0.5.11/http",
+    "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^5.2.0",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.3.2",
+    "tailwindcss": "npm:tailwindcss@^4.3.2",
+    "@types/react": "npm:@types/react@^18.3.12",
+    "@types/react-dom": "npm:@types/react-dom@^18.3.1"
+  },
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "module": "ESNext"
+  }
+}

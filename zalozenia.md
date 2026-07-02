@@ -18,9 +18,11 @@ Celem jest **najmniejszy możliwy setup**, który da się rozbudować — nie pr
 
 | Warstwa | Technologia |
 |---------|-------------|
-| Runtime / bundler | Vinxi (Vite pod spodem) |
-| UI | React 18 |
-| Język | TypeScript |
+| Runtime | **Deno 2** (npm compatibility mode) |
+| Bundler / dev server | Vinxi (Vite pod spodem) |
+| UI | React 18 + MobX |
+| Język | TypeScript (`deno.json` → `compilerOptions`) |
+| CSS | Tailwind CSS v4 (`@tailwindcss/vite`) |
 | HMR | `@vitejs/plugin-react` 5.x (router `client`) |
 
 ---
@@ -28,12 +30,18 @@ Celem jest **najmniejszy możliwy setup**, który da się rozbudować — nie pr
 ## Struktura projektu
 
 ```
+deno.json              # zależności npm:, taski, compilerOptions
 app.config.ts          # konfiguracja Vinxi (jedyne miejsce definicji routerów)
+createApp.ts           # otypowany wrapper createApp (vinxi#514)
+Taskfile.yaml          # taski (dev, build, start, typecheck, …)
 src/
-  index.html           # shell SPA — Vite wstrzykuje skrypty przez transformIndexHtml
+  index.html           # shell SPA
   entry-api.ts         # handler HTTP — endpointy API
-  entry-client.tsx     # wejście przeglądarki — createRoot
-  App.tsx              # jedyny komponent aplikacji
+  entry-client/
+    entry-client.tsx   # wejście przeglądarki — createRoot
+    App.tsx            # komponent aplikacji (MobX observer)
+    appStore.ts        # stan MobX (licznik, fetch /api/health)
+    style.css          # @import "tailwindcss"
 ```
 
 Brak routera stron, brak CSS frameworków, brak server functions.
@@ -94,30 +102,40 @@ Przykład: `GET /api/health` → `{ status: "ok", time: "..." }`.
 
 ## `App.tsx` — wymagania
 
-- Jeden komponent z `useState` (licznik) — weryfikacja interaktywności i HMR.
-- `fetch("/api/health")` w `useEffect` — weryfikacja połączenia z API.
+- Komponent `observer` z `mobx-react` — licznik w `appStore`.
+- `appStore.loadHealth()` w `useEffect` — weryfikacja połączenia z API.
 - Zwykły komponent w `#root` — bez pełnej struktury `<html>`.
 
 ---
 
-## Komendy (`Taskfile.yaml`)
+## Komendy
+
+Instalacja zależności (raz po klonowaniu):
+
+```bash
+deno install
+# lub: task install
+```
 
 | Task | Opis |
 |------|------|
-| `task dev` | serwer deweloperski |
+| `task dev` | serwer deweloperski (HMR) |
 | `task build` | build produkcyjny |
-| `task start` | uruchomienie po buildzie |
-| `task typecheck` | sprawdzenie typów TS |
+| `task start` | uruchomienie po buildzie (vinxi start) |
+| `task start-static` | build bezpośrednio przez Deno |
+| `task typecheck` | sprawdzenie typów (`deno check`) |
+| `task install` | instalacja zależności npm |
 
 Po zmianie routerów: `rm -rf .vinxi` przed `task dev` (stary cache).
 
 ---
 
-## TypeScript (`tsconfig.json`)
+## TypeScript (`deno.json`)
 
-- `jsx: "react-jsx"`
+- `jsx: "react-jsx"`, `jsxImportSource: "react"`
 - `module: "ESNext"`
-- `moduleResolution: "Bundler"`
+- zależności przez `imports` (`npm:…`)
+- `nodeModulesDir: "auto"` — Vinxi/Vite wymagają `node_modules/`
 
 ---
 
@@ -138,7 +156,7 @@ Pośrednie buildy per-router: `.vinxi/build/api/`, `.vinxi/build/client/`.
 
 ## Kryteria akceptacji
 
-- [ ] `task dev` — aplikacja na localhost, bez błędów w konsoli.
+- [ ] `deno install && task dev` — aplikacja na localhost, bez błędów w konsoli.
 - [ ] `GET /api/health` zwraca JSON.
 - [ ] Licznik działa (interaktywność SPA).
 - [ ] Edycja `App.tsx` w dev zachowuje stan licznika (HMR).

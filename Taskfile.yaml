@@ -4,27 +4,32 @@ tasks:
   dev:
     desc: Uruchamia serwer deweloperski (HMR)
     cmds:
-      - ./node_modules/.bin/vinxi dev
+      - deno run -A npm:vinxi dev
     interactive: true
 
   build:
     desc: Buduje projekt do produkcji
     cmds:
-      - ./node_modules/.bin/vinxi build
+      - deno run -A npm:vinxi build
 
   start:
     desc: Uruchamia zbudowaną aplikację (wymaga wcześniejszego build)
     cmds:
-      - ./node_modules/.bin/vinxi start
+      - deno run -A npm:vinxi start
     interactive: true
 
   start-static:
-    desc: Uruchamia build bezpośrednio przez node (wymaga wcześniejszego build)
+    desc: Uruchamia build bezpośrednio przez Deno (wymaga wcześniejszego build)
     cmds:
-      - NODE_ENV=production node .output/server/index.mjs
+      - sh -c 'NODE_ENV=production exec deno run -A .output/server/index.mjs'
     interactive: true
 
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
     cmds:
-      - ./node_modules/.bin/tsc --noEmit
+      - deno check app.config.ts createApp.ts src/entry-api.ts src/entry-client/entry-client.tsx src/entry-client/App.tsx src/entry-client/appStore.ts
+
+  install:
+    desc: Instaluje zależności npm przez Deno
+    cmds:
+      - deno install
