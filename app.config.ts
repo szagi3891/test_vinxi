@@ -29,7 +29,10 @@ export default createApp({
       root: "./src",
       target: "browser",
       base: "/",
-      plugins: () => [clientCacheDirPlugin, reactRefresh()],
+      plugins: () => [
+        clientCacheDirPlugin,
+        reactRefresh()
+      ],
     },
   ],
 });
