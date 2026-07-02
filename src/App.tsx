@@ -1,40 +1,33 @@
-import { useEffect, useState } from "react";
+import { observer } from "mobx-react";
+import { useEffect } from "react";
+import { appStore } from "./appStore";
 
-type ApiResponse = {
-  status: string;
-  time: string;
-};
-
-export default function App() {
-  const [count, setCount] = useState(0);
-  const [api, setApi] = useState<ApiResponse | null>(null);
-  const [apiError, setApiError] = useState<string | null>(null);
-
+const App = observer(function App() {
   useEffect(() => {
-    fetch("/api/health")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json() as Promise<ApiResponse>;
-      })
-      .then(setApi)
-      .catch((err: Error) => setApiError(err.message));
+    void appStore.loadHealth();
   }, []);
 
   return (
-    <main>
-      <h1>Vinxi + React SPA</h1>
-      <p>Licznik: {count}</p>
-      <button type="button" onClick={() => setCount((c) => c + 1)}>
+    <main className="mx-auto max-w-lg space-y-4 p-8 font-sans">
+      <h1 className="text-2xl font-bold text-slate-900">Vinxi + React SPA</h1>
+      <p className="text-slate-700">Licznik: {appStore.count}</p>
+      <button
+        type="button"
+        className="rounded bg-slate-900 px-4 py-2 text-white hover:bg-slate-700"
+        onClick={() => appStore.increment()}
+      >
         +1
       </button>
-      <p>
+      <p className="text-sm text-slate-500">
         API:{" "}
-        {apiError
-          ? `błąd (${apiError})`
-          : api
-            ? `${api.status} @ ${api.time}`
+        {appStore.apiError
+          ? `błąd (${appStore.apiError})`
+          : appStore.api
+            ? `${appStore.api.status} @ ${appStore.api.time}`
             : "ładowanie…"}
       </p>
     </main>
   );
-}
+});
+
+export default App;

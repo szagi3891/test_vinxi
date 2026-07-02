@@ -1,4 +1,5 @@
 import reactRefresh from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 import { createApp } from "./createApp";
 
 const clientCacheDirPlugin = {
@@ -31,7 +32,8 @@ export default createApp({
       base: "/",
       plugins: () => [
         clientCacheDirPlugin,
-        reactRefresh()
+        tailwindcss(),
+        reactRefresh(),
       ],
     },
   ],
