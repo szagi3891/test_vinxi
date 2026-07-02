@@ -18,6 +18,12 @@ tasks:
       - ./node_modules/.bin/vinxi start
     interactive: true
 
+  start-static:
+    desc: Uruchamia build bezpośrednio przez node (wymaga wcześniejszego build)
+    cmds:
+      - NODE_ENV=production node .output/server/index.mjs
+    interactive: true
+
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
     cmds:
