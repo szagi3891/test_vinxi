@@ -1,15 +1,16 @@
-# Założenia POC — Vinxi + React SSR
+# Założenia POC — Vinxi + React SPA + API
 
-Minimalny proof-of-concept full-stack aplikacji React z SSR na Vinxi.  
+Minimalny proof-of-concept full-stack aplikacji React jako SPA z API na Vinxi.  
 Celem jest **najmniejszy możliwy setup**, który da się rozbudować — nie produkcyjny framework.
 
 ---
 
 ## Cel
 
-- Zweryfikować, że Vinxi poprawnie rozdziela bundling klienta i serwera.
-- Zweryfikować SSR + hydration Reacta.
+- Zweryfikować, że Vinxi poprawnie rozdziela bundling klienta (SPA) i serwera (API).
+- Zweryfikować SPA + hydration Reacta.
 - Zweryfikować HMR (React Fast Refresh) w trybie dev.
+- Zweryfikować prosty endpoint API (`/api/health`).
 
 ---
 
@@ -20,7 +21,7 @@ Celem jest **najmniejszy możliwy setup**, który da się rozbudować — nie pr
 | Runtime / bundler | Vinxi (Vite pod spodem) |
 | UI | React 18 |
 | Język | TypeScript |
-| HMR | `@vitejs/plugin-react` (tylko router `client`) |
+| HMR | `@vitejs/plugin-react` 5.x (router `client`) |
 
 ---
 
@@ -28,14 +29,14 @@ Celem jest **najmniejszy możliwy setup**, który da się rozbudować — nie pr
 
 ```
 app.config.ts          # konfiguracja Vinxi (jedyne miejsce definicji routerów)
+index.html             # shell SPA — Vite wstrzykuje skrypty przez transformIndexHtml
 src/
-  entry-server.tsx     # handler HTTP — render SSR
-  entry-client.tsx     # wejście przeglądarki — hydration
-  init-react-refresh.ts # dev: preamble React Refresh (v4 plugin — bez tego błąd MIME/HMR)
+  entry-api.ts         # handler HTTP — endpointy API
+  entry-client.tsx     # wejście przeglądarki — createRoot
   App.tsx              # jedyny komponent aplikacji
 ```
 
-Brak routera stron, brak CSS frameworków, brak API, brak server functions.
+Brak routera stron, brak CSS frameworków, brak server functions.
 
 ---
 
@@ -52,65 +53,49 @@ server: {
 },
 ```
 
-### 1. `client` (browser)
-
-- `type: "client"`
-- `handler: "./src/entry-client.tsx"`
-- `target: "browser"`
-- `base: "/_build"`
-- `plugins: () => [reactRefresh()]` — **jedyny** plugin w projekcie; odpowiada za HMR.
-
-### 2. `ssr` (server)
+### 1. `api` (server)
 
 - `type: "http"`
-- `handler: "./src/entry-server.tsx"`
-- `target: "server"`
-- Brak pluginów — domyślna transformacja TSX przez Vite/esbuild wystarcza.
+- `handler: "./src/entry-api.ts"`
+- `base: "/api"`
+- Brak pluginów — domyślna transformacja TS przez Vite/esbuild wystarcza.
+
+### 2. `client` (browser, SPA)
+
+- `type: "spa"`
+- `handler: "./index.html"`
+- `target: "browser"`
+- `base: "/"`
+- `plugins: () => [reactRefresh()]` — **jedyny** plugin w projekcie; odpowiada za HMR.
+
+**Uwaga routingu:** `GET /api/` trafia w fallback SPA — używaj ścieżek z segmentem, np. `/api/health`.
 
 ---
 
-## `entry-server.tsx` — wymagania
+## `entry-api.ts` — wymagania
 
 Handler musi:
 
 1. Użyć `eventHandler` z `vinxi/http`.
-2. Pobrać manifest klienta: `getManifest("client")` z `vinxi/manifest`.
-3. Wyrenderować `<App />` przez `renderToString` (bez streamingu).
-4. Wstrzyknąć skrypt klienta ręcznie przed `</body>` — `scriptSrc` z manifestu + `window.manifest`.
-5. Ustawić `Content-Type: text/html` i zwrócić stream HTML.
+2. Zwracać JSON (h3 serializuje obiekty automatycznie).
 
-### Co jest niezbędne (nie da się usunąć bez zmiany architektury)
-
-| Element | Dlaczego |
-|---------|----------|
-| `getManifest("client")` + `scriptSrc` | Jedyny sposób, by SSR wiedział, który bundle załadować w przeglądarce |
-| Ręczny `<script type="module" src="…">` przed `</body>` | `renderToString` nie wstrzykuje entry-client — bez tego brak hydration |
-| `window.manifest` | Opcjonalny w tym POC — potrzebny dopiero gdy klient używa `getManifest()` / `@vinxi/react` |
-
-### Co można uprościć (bez zmiany założeń)
-
-- Skrócić nazwy zmiennych (`client` zamiast `clientManifest`).
+Przykład: `GET /api/health` → `{ status: "ok", time: "..." }`.
 
 ---
 
-## `entry-client.tsx` — wymagania
+## `index.html` + `entry-client.tsx`
 
-1. `import "./init-react-refresh"` — dev: React Refresh preamble (patrz niżej).
-2. `import "vinxi/client"` — runtime manifestu Vinxi.
-3. `hydrateRoot(document, <App />)` — hydration pełnego dokumentu.
-
-### Dlaczego `init-react-refresh.ts`?
-
-SSR omija `transformIndexHtml` Vite. Używamy `@vitejs/plugin-react` **v4** (v6 nie współpracuje z Vite w Vinxi). Preamble inicjujemy ręcznie przed importem komponentów.
+- `index.html` — `<div id="root">` + `<script type="module" src="/src/entry-client.tsx">`.
+- Vite w dev/prod wstrzykuje bundle i HMR przez `transformIndexHtml` — **brak ręcznego preamble**.
+- `entry-client.tsx` — `createRoot(document.getElementById("root")).render(<App />)`.
 
 ---
 
 ## `App.tsx` — wymagania
 
 - Jeden komponent z `useState` (licznik) — weryfikacja interaktywności i HMR.
-- Znacznik czasu renderu SSR (`serverRenderedAt` jako prop z entry-server) — widać różnicę między SSR a klientem.
-- `suppressHydrationWarning` na elemencie z timestampem — klient nie przekazuje tego propa przy hydration.
-- Pełna struktura `<html>` / `<head>` / `<body>` — wymagana przez `hydrateRoot(document, ...)`.
+- `fetch("/api/health")` w `useEffect` — weryfikacja połączenia z API.
+- Zwykły komponent w `#root` — bez pełnej struktury `<html>`.
 
 ---
 
@@ -122,6 +107,8 @@ SSR omija `transformIndexHtml` Vite. Używamy `@vitejs/plugin-react` **v4** (v6 
 | `task build` | build produkcyjny |
 | `task start` | uruchomienie po buildzie |
 | `task typecheck` | sprawdzenie typów TS |
+
+Po zmianie routerów: `rm -rf .vinxi` przed `task dev` (stary cache).
 
 ---
 
@@ -139,20 +126,20 @@ Po `task build`:
 
 | Ścieżka | Zawartość |
 |---------|-----------|
-| `.output/public/_build/` | Bundle klienta + manifest Vite |
-| `.output/server/index.mjs` | Jeden plik serwera (React, vinxi, handler SSR — bez `node_modules/`) |
+| `.output/public/` | `index.html` + bundle klienta (`assets/`) |
+| `.output/server/index.mjs` | Jeden plik serwera (API + serwowanie SPA — bez `node_modules/`) |
 
 Deploy produkcyjny: `index.mjs` + katalog `public/`.
 
-Pośrednie buildy per-router: `.vinxi/build/client/`, `.vinxi/build/ssr/`.
+Pośrednie buildy per-router: `.vinxi/build/api/`, `.vinxi/build/client/`.
 
 ---
 
 ## Kryteria akceptacji
 
 - [ ] `task dev` — aplikacja na localhost, bez błędów w konsoli.
-- [ ] Odświeżenie strony zmienia znacznik czasu SSR.
-- [ ] Licznik działa po hydration (bez pełnego reload).
+- [ ] `GET /api/health` zwraca JSON.
+- [ ] Licznik działa (interaktywność SPA).
 - [ ] Edycja `App.tsx` w dev zachowuje stan licznika (HMR).
 - [ ] `task build && task start` — produkcja działa; `.output/server/` bez `node_modules/`.
 
@@ -163,7 +150,7 @@ Pośrednie buildy per-router: `.vinxi/build/client/`, `.vinxi/build/ssr/`.
 - Router `static` / lokalny katalog `public/` (favicon, obrazy itp.)
 - Routing (react-router, file-based routes)
 - CSS / CSS frameworki
-- API / server functions
+- Rozbudowane API (wiele endpointów, walidacja, DB)
 - `@vinxi/react` (`createAssets`, `lazyRoute`)
 - Testy automatyczne
 - Linting / formatting config poza `tsconfig.json`

@@ -42,5 +42,13 @@ declare module "vinxi/http" {
     handler: T;
   }): T;
 
+  export function getRequestURL(event: H3Event): URL;
+  export function readBody<T = unknown>(event: H3Event): Promise<T>;
+  export function setResponseStatus(
+    event: H3Event,
+    status: number,
+    statusText?: string,
+  ): void;
+
   export type { H3Event };
 }
