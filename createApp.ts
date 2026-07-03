@@ -6,6 +6,7 @@ export type VinxiRouter = {
   type: string;
   handler?: string;
   root?: string;
+  dir?: string;
   base?: string;
   target?: "browser" | "server";
   plugins?: () => unknown[];
