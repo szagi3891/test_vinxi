@@ -26,10 +26,42 @@ tasks:
       - deno run -A .output/server/index.mjs
     interactive: true
 
+  desktop-dev:
+    desc: Uruchamia serwer deweloperski desktop (HMR, src_desktop)
+    cmds:
+      - deno run -A npm:vinxi dev --config app-desktop.config.ts
+    interactive: true
+
+  desktop-build:
+    desc: Buduje wersję desktop do produkcji
+    cmds:
+      - deno run -A npm:vinxi build --config app-desktop.config.ts
+
+  desktop-start:
+    desc: Uruchamia zbudowaną aplikację desktop (wymaga desktop-build)
+    cmds:
+      - deno run -A npm:vinxi start --config app-desktop.config.ts
+    interactive: true
+
+  desktop-start-static:
+    desc: Uruchamia build desktop bezpośrednio przez Deno (wymaga desktop-build)
+    env:
+      NODE_ENV: production
+    cmds:
+      - deno run -A .output/server/index.mjs
+    interactive: true
+
+  desktop-build-image:
+    desc: Buduje binarną aplikację desktop (wymaga desktop-build)
+    deps:
+      - desktop-build
+    cmds:
+      - deno desktop -A --no-check --include .output .output/server/index.mjs
+
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
     cmds:
-      - deno check app.config.ts createApp.ts src/entry-api.ts src/entry-client/entry-client.tsx src/entry-client/App.tsx src/entry-client/appStore.ts
+      - deno check app.config.ts app-desktop.config.ts createApp.ts src/ src_desktop/
 
   install:
     desc: Instaluje zależności npm przez Deno

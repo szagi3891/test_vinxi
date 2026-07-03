@@ -19,7 +19,16 @@
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable", "deno.ns"],
     "module": "ESNext"
+  },
+  "desktop": {
+    "app": {
+      "name": "Vinxi Desktop POC",
+      "identifier": "com.test.vinxi-desktop"
+    },
+    "output": {
+      "macos": "./dist/vinxi-desktop.app"
+    }
   }
 }
