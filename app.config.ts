@@ -13,6 +13,7 @@ const clientCacheDirPlugin = {
 
 export default createApp({
   server: {
+    experimental: { websocket: true },
     noExternals: true,
     inlineDynamicImports: true,
   },
@@ -22,6 +23,13 @@ export default createApp({
       type: "http",
       handler: "./src/entry-api.ts",
       base: "/api",
+    },
+    {
+      name: "ws",
+      type: "http",
+      handler: "./src/entry-ws.ts",
+      base: "/_ws",
+      websocket: true,
     },
     {
       name: "client",

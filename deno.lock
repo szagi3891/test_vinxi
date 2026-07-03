@@ -5,6 +5,7 @@
     "npm:@types/react-dom@^18.3.1": "18.3.7_@types+react@18.3.31",
     "npm:@types/react@^18.3.12": "18.3.31",
     "npm:@vitejs/plugin-react@^5.2.0": "5.2.0_vite@6.4.3__jiti@2.7.0",
+    "npm:crossws@*": "0.3.5",
     "npm:mobx-react@^9.2.2": "9.2.2_mobx@6.16.1_react@18.3.1",
     "npm:mobx@^6.16.1": "6.16.1",
     "npm:react-dom@^18.3.1": "18.3.1_react@18.3.1",
