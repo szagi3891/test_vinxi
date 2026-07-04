@@ -19,12 +19,6 @@ export default createApp({
   },
   routers: [
     {
-      name: "public",
-      type: "static",
-      dir: "./src/public",
-      base: "/",
-    },
-    {
       name: "api",
       type: "http",
       handler: "./src/entry-api.ts",
