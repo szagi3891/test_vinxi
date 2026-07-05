@@ -42,7 +42,12 @@ function resolveApiRoute(
     return { status: 200, body: { created: { id: 2, name: body?.name ?? "anon" } } };
   }
 
-  return { status: 404, body: { error: "Not found" } };
+  return {
+    status: 404,
+    body: {
+      error: "Not found"
+    }
+  };
 }
 
 export async function handleApiRequest(
