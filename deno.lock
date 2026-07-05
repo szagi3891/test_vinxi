@@ -5,7 +5,6 @@
     "npm:@types/node@^22.15.21": "22.20.0",
     "npm:@types/react-dom@^18.3.1": "18.3.7_@types+react@18.3.31",
     "npm:@types/react@^18.3.12": "18.3.31",
-    "npm:@types/ws@^8.18.1": "8.18.1",
     "npm:@vitejs/plugin-react@*": "5.2.0_vite@6.4.3__@types+node@22.20.0_@types+node@22.20.0",
     "npm:@vitejs/plugin-react@^5.2.0": "5.2.0_vite@6.4.3__@types+node@22.20.0_@types+node@22.20.0",
     "npm:crossws@*": "0.3.5",
@@ -17,8 +16,7 @@
     "npm:vinxi@*": "0.5.11_@types+node@22.20.0",
     "npm:vinxi@~0.5.11": "0.5.11_@types+node@22.20.0",
     "npm:vite@*": "6.4.3_@types+node@22.20.0",
-    "npm:vite@^6.4.3": "6.4.3_@types+node@22.20.0",
-    "npm:ws@^8.18.2": "8.21.0"
+    "npm:vite@^6.4.3": "6.4.3_@types+node@22.20.0"
   },
   "npm": {
     "@babel/code-frame@7.29.7": {
@@ -1048,12 +1046,6 @@
     },
     "@types/resolve@1.20.2": {
       "integrity": "sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q=="
-    },
-    "@types/ws@8.18.1": {
-      "integrity": "sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==",
-      "dependencies": [
-        "@types/node"
-      ]
     },
     "@vercel/nft@1.10.2_rollup@4.62.2": {
       "integrity": "sha512-w+WyX5Ulmj4dtTZrxaulqrjaLZHSbnPzx75SJsTNYmotKsqn1JlLnDJa+lz5hn90HJofhl/2MAtw0mCrgM3qYw==",
@@ -3245,9 +3237,6 @@
         "strip-ansi@7.2.0"
       ]
     },
-    "ws@8.21.0": {
-      "integrity": "sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g=="
-    },
     "wsl-utils@0.3.1": {
       "integrity": "sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==",
       "dependencies": [
@@ -3313,7 +3302,6 @@
       "npm:@types/node@^22.15.21",
       "npm:@types/react-dom@^18.3.1",
       "npm:@types/react@^18.3.12",
-      "npm:@types/ws@^8.18.1",
       "npm:@vitejs/plugin-react@^5.2.0",
       "npm:mobx-react@^9.2.2",
       "npm:mobx@^6.16.1",
@@ -3321,8 +3309,7 @@
       "npm:react@^18.3.1",
       "npm:tailwindcss@^4.3.2",
       "npm:vinxi@~0.5.11",
-      "npm:vite@^6.4.3",
-      "npm:ws@^8.18.2"
+      "npm:vite@^6.4.3"
     ]
   }
 }

@@ -1,25 +1,4 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
-
 type ApiBody = { name?: string };
-
-async function readJsonBody(req: IncomingMessage): Promise<ApiBody | null> {
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) {
-    chunks.push(chunk as Buffer);
-  }
-  if (chunks.length === 0) return null;
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString()) as ApiBody;
-  } catch {
-    return null;
-  }
-}
-
-function sendJson(res: ServerResponse, status: number, body: unknown) {
-  res.statusCode = status;
-  res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify(body));
-}
 
 function resolveApiRoute(
   pathname: string,
@@ -45,18 +24,9 @@ function resolveApiRoute(
   return {
     status: 404,
     body: {
-      error: "Not found"
-    }
+      error: "Not found",
+    },
   };
-}
-
-export async function handleApiRequest(
-  pathname: string,
-  method: string | undefined,
-  req: IncomingMessage,
-): Promise<{ status: number; body: unknown } | null> {
-  const body = method === "POST" ? await readJsonBody(req) : null;
-  return resolveApiRoute(pathname, method ?? "GET", body);
 }
 
 export async function handleApiFetch(request: Request): Promise<Response | null> {
@@ -75,17 +45,4 @@ export async function handleApiFetch(request: Request): Promise<Response | null>
   if (!result) return null;
 
   return Response.json(result.body, { status: result.status });
-}
-
-export function createApiMiddleware() {
-  return async (
-    req: IncomingMessage,
-    res: ServerResponse,
-    next: () => void,
-  ) => {
-    const url = new URL(req.url ?? "/", "http://localhost");
-    const result = await handleApiRequest(url.pathname, req.method, req);
-    if (!result) return next();
-    sendJson(res, result.status, result.body);
-  };
 }

@@ -1,5 +1,5 @@
 import { extname } from "node:path";
-import { handleApiFetch } from "./api-routes.ts";
+import { createRequestHandler } from "./request-handler.ts";
 
 const clientDist = new URL("../client/", import.meta.url);
 const port = Number(Deno.env.get("PORT") ?? 3000);
@@ -14,7 +14,7 @@ const MIME: Record<string, string> = {
   ".ico": "image/x-icon",
 };
 
-async function serveStatic(pathname: string): Promise<Response | null> {
+async function serveStatic(pathname: string): Promise<Response> {
   const rel = pathname === "/" ? "index.html" : pathname.replace(/^\//, "");
   const fileUrl = new URL(rel, clientDist);
 
@@ -32,51 +32,17 @@ async function serveStatic(pathname: string): Promise<Response | null> {
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
       } catch {
-        return null;
+        return new Response("Not found", { status: 404 });
       }
     }
-    return null;
+    return new Response("Not found", { status: 404 });
   }
 }
 
-function handleWebSocket(request: Request): Response {
-  const { socket, response } = Deno.upgradeWebSocket(request);
-  const id = crypto.randomUUID();
-
-  socket.onopen = () => {
-    console.log(`[ws] połączono ${id}`);
-    socket.send("połączono");
-  };
-
-  socket.onmessage = (event) => {
-    socket.send(`echo: ${event.data}`);
-  };
-
-  socket.onclose = () => {
-    console.log(`[ws] rozłączono ${id}`);
-  };
-
-  return response;
-}
-
-async function handleRequest(request: Request): Promise<Response> {
+const handleRequest = createRequestHandler((request) => {
   const url = new URL(request.url);
-
-  if (url.pathname === "/_ws") {
-    if (request.headers.get("upgrade")?.toLowerCase() !== "websocket") {
-      return new Response("Expected WebSocket", { status: 426 });
-    }
-    return handleWebSocket(request);
-  }
-
-  const apiResponse = await handleApiFetch(request);
-  if (apiResponse) return apiResponse;
-
-  const staticResponse = await serveStatic(url.pathname);
-  if (staticResponse) return staticResponse;
-
-  return new Response("Not found", { status: 404 });
-}
+  return serveStatic(url.pathname);
+});
 
 console.log(`Production server: http://localhost:${port}`);
 Deno.serve({ port }, handleRequest);

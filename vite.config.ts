@@ -3,8 +3,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
-import { createApiMiddleware } from "./src_vite/api-routes.ts";
-import { attachWebSocketServer } from "./src_vite/entry-ws.ts";
 
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 const serverEntry = resolve(rootDir, "src_vite/entry-prod-server.ts");
@@ -19,36 +17,11 @@ function clientOnly(plugin: Plugin | Plugin[]): Plugin[] {
   }));
 }
 
-function fullstackPlugin(): Plugin {
-  const api = createApiMiddleware();
-
-  return {
-    name: "fullstack",
-    applyToEnvironment(env) {
-      return env.name === "client";
-    },
-    configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (!req.url?.startsWith("/api")) return next();
-        api(req, res, next);
-      });
-      attachWebSocketServer(server.httpServer);
-    },
-    configurePreviewServer(server) {
-      server.middlewares.use((req, res, next) => {
-        if (!req.url?.startsWith("/api")) return next();
-        api(req, res, next);
-      });
-      attachWebSocketServer(server.httpServer);
-    },
-  };
-}
-
 export default defineConfig({
   root: "./src_vite",
   cacheDir: "../node_modules/.vite",
   builder: {},
-  plugins: [...clientOnly(react()), ...clientOnly(tailwindcss()), fullstackPlugin()],
+  plugins: [...clientOnly(react()), ...clientOnly(tailwindcss())],
   environments: {
     client: {
       build: {

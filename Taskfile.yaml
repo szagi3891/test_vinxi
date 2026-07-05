@@ -61,7 +61,7 @@ tasks:
   vite-dev:
     desc: Uruchamia serwer deweloperski Vite (HMR, src_vite)
     cmds:
-      - deno run -A npm:vite --config vite.config.ts
+      - deno run -A src_vite/entry-dev-server.ts
     interactive: true
 
   vite-build:
@@ -71,8 +71,10 @@ tasks:
 
   vite-preview:
     desc: Podgląd buildu Vite (wymaga vite-build)
+    env:
+      PORT: 4173
     cmds:
-      - deno run -A npm:vite preview --config vite.config.ts
+      - deno run -A dist_vite/server/index.mjs
     interactive: true
 
   vite-start:
@@ -86,7 +88,7 @@ tasks:
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
     cmds:
-      - deno check app.config.ts app-desktop.config.ts createApp.ts vite.config.ts src/ src_desktop/ src_vite/api-routes.ts src_vite/entry-prod-server.ts src_vite/entry-ws.ts src_vite/entry-client/
+      - deno check app.config.ts app-desktop.config.ts createApp.ts vite.config.ts src/ src_desktop/ src_vite/api-routes.ts src_vite/connect-bridge.ts src_vite/request-handler.ts src_vite/entry-dev-server.ts src_vite/entry-prod-server.ts src_vite/entry-client/
 
   install:
     desc: Instaluje zależności npm przez Deno
