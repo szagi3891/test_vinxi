@@ -21,11 +21,11 @@ function sendJson(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-export async function handleApiRequest(
+function resolveApiRoute(
   pathname: string,
-  method: string | undefined,
-  req: IncomingMessage,
-): Promise<{ status: number; body: unknown } | null> {
+  method: string,
+  body: ApiBody | null,
+): { status: number; body: unknown } | null {
   if (!pathname.startsWith("/api")) return null;
 
   const path = pathname.replace(/^\/api/, "") || "/";
@@ -39,11 +39,37 @@ export async function handleApiRequest(
   }
 
   if (path === "/users" && method === "POST") {
-    const body = await readJsonBody(req);
     return { status: 200, body: { created: { id: 2, name: body?.name ?? "anon" } } };
   }
 
   return { status: 404, body: { error: "Not found" } };
+}
+
+export async function handleApiRequest(
+  pathname: string,
+  method: string | undefined,
+  req: IncomingMessage,
+): Promise<{ status: number; body: unknown } | null> {
+  const body = method === "POST" ? await readJsonBody(req) : null;
+  return resolveApiRoute(pathname, method ?? "GET", body);
+}
+
+export async function handleApiFetch(request: Request): Promise<Response | null> {
+  const url = new URL(request.url);
+  let body: ApiBody | null = null;
+
+  if (request.method === "POST") {
+    try {
+      body = (await request.json()) as ApiBody;
+    } catch {
+      body = null;
+    }
+  }
+
+  const result = resolveApiRoute(url.pathname, request.method, body);
+  if (!result) return null;
+
+  return Response.json(result.body, { status: result.status });
 }
 
 export function createApiMiddleware() {

@@ -1,12 +1,8 @@
-import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
-import { extname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { createApiMiddleware } from "./api-routes.ts";
-import { attachWebSocketServer } from "./entry-ws.ts";
+import { extname } from "node:path";
+import { handleApiFetch } from "./api-routes.ts";
 
-const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const clientDist = join(__dirname, "..", "client");
+const clientDist = new URL("../client/", import.meta.url);
+const port = Number(Deno.env.get("PORT") ?? 3000);
 
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -19,19 +15,19 @@ const MIME: Record<string, string> = {
 };
 
 async function serveStatic(pathname: string): Promise<Response | null> {
-  const rel = pathname === "/" ? "/index.html" : pathname;
-  const filePath = join(clientDist, rel);
+  const rel = pathname === "/" ? "index.html" : pathname.replace(/^\//, "");
+  const fileUrl = new URL(rel, clientDist);
 
   try {
-    const data = await readFile(filePath);
-    const ext = extname(filePath);
+    const data = await Deno.readFile(fileUrl);
+    const ext = extname(rel);
     return new Response(data, {
       headers: { "Content-Type": MIME[ext] ?? "application/octet-stream" },
     });
   } catch {
     if (!extname(rel)) {
       try {
-        const data = await readFile(join(clientDist, "index.html"));
+        const data = await Deno.readFile(new URL("index.html", clientDist));
         return new Response(data, {
           headers: { "Content-Type": "text/html; charset=utf-8" },
         });
@@ -43,26 +39,44 @@ async function serveStatic(pathname: string): Promise<Response | null> {
   }
 }
 
-const apiMiddleware = createApiMiddleware();
-const port = Number(Deno.env.get("PORT") ?? 3000);
+function handleWebSocket(request: Request): Response {
+  const { socket, response } = Deno.upgradeWebSocket(request);
+  const id = crypto.randomUUID();
 
-const server = createServer((req, res) => {
-  apiMiddleware(req, res, async () => {
-    const url = new URL(req.url ?? "/", `http://localhost:${port}`);
-    const response = await serveStatic(url.pathname);
-    if (response) {
-      res.statusCode = response.status;
-      response.headers.forEach((value, key) => res.setHeader(key, value));
-      res.end(Buffer.from(await response.arrayBuffer()));
-      return;
+  socket.onopen = () => {
+    console.log(`[ws] połączono ${id}`);
+    socket.send("połączono");
+  };
+
+  socket.onmessage = (event) => {
+    socket.send(`echo: ${event.data}`);
+  };
+
+  socket.onclose = () => {
+    console.log(`[ws] rozłączono ${id}`);
+  };
+
+  return response;
+}
+
+async function handleRequest(request: Request): Promise<Response> {
+  const url = new URL(request.url);
+
+  if (url.pathname === "/_ws") {
+    if (request.headers.get("upgrade")?.toLowerCase() !== "websocket") {
+      return new Response("Expected WebSocket", { status: 426 });
     }
-    res.statusCode = 404;
-    res.end("Not found");
-  });
-});
+    return handleWebSocket(request);
+  }
 
-attachWebSocketServer(server);
+  const apiResponse = await handleApiFetch(request);
+  if (apiResponse) return apiResponse;
 
-server.listen(port, () => {
-  console.log(`Production server: http://localhost:${port}`);
-});
+  const staticResponse = await serveStatic(url.pathname);
+  if (staticResponse) return staticResponse;
+
+  return new Response("Not found", { status: 404 });
+}
+
+console.log(`Production server: http://localhost:${port}`);
+Deno.serve({ port }, handleRequest);
