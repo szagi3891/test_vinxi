@@ -48,12 +48,14 @@ export default defineConfig({
   root: "./src_vite",
   cacheDir: "../node_modules/.vite",
   builder: {},
-  build: {
-    outDir: "../dist_vite/client",
-    emptyOutDir: true,
-  },
   plugins: [...clientOnly(react()), ...clientOnly(tailwindcss()), fullstackPlugin()],
   environments: {
+    client: {
+      build: {
+        outDir: "../dist_vite/client",
+        emptyOutDir: true,
+      },
+    },
     server: {
       resolve: {
         noExternal: true,
