@@ -2,7 +2,7 @@ import http from "node:http";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
-import { connectToWeb } from "./connect-bridge.ts";
+import { connectToWeb } from "../vite-connect-bridge.ts";
 import { createRequestHandler } from "./request-handler.ts";
 
 const rootDir = dirname(fileURLToPath(new URL("../vite.config.ts", import.meta.url)));

@@ -19,6 +19,7 @@ export function connectToWeb(
   middleware: Connect.Server,
 ): (request: Request) => Promise<Response> {
   return (request: Request) =>
+    // deno-lint-ignore no-async-promise-executor
     new Promise(async (resolve, reject) => {
       try {
         const socket = new MockSocket() as unknown as Socket;

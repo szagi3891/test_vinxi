@@ -21,7 +21,7 @@ export function handleWebSocket(request: Request): Response {
 }
 
 export function createRequestHandler(
-  fallback: (request: Request) => Response | Promise<Response>,
+  fallback: (request: Request) => Promise<Response>,
 ) {
   return async (request: Request): Promise<Response> => {
     const url = new URL(request.url);
