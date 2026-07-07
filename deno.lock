@@ -8,6 +8,8 @@
     "npm:@vitejs/plugin-react@*": "5.2.0_vite@6.4.3__@types+node@22.20.0_@types+node@22.20.0",
     "npm:@vitejs/plugin-react@^5.2.0": "5.2.0_vite@6.4.3__@types+node@22.20.0_@types+node@22.20.0",
     "npm:crossws@*": "0.3.5",
+    "npm:fetch-to-node@*": "2.1.0",
+    "npm:fetch-to-node@^2.1.0": "2.1.0",
     "npm:mobx-react@^9.2.2": "9.2.2_mobx@6.16.1_react@18.3.1",
     "npm:mobx@^6.16.1": "6.16.1",
     "npm:react-dom@^18.3.1": "18.3.1_react@18.3.1",
@@ -1715,6 +1717,9 @@
         "picomatch@4.0.4"
       ]
     },
+    "fetch-to-node@2.1.0": {
+      "integrity": "sha512-Wq05j6LE1GrWpT2t1YbCkyFY6xKRJq3hx/oRJdWEJpZlik3g25MmdJS6RFm49iiMJw6zpZuBOrgihOgy2jGyAA=="
+    },
     "file-uri-to-path@1.0.0": {
       "integrity": "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw=="
     },
@@ -3303,6 +3308,7 @@
       "npm:@types/react-dom@^18.3.1",
       "npm:@types/react@^18.3.12",
       "npm:@vitejs/plugin-react@^5.2.0",
+      "npm:fetch-to-node@^2.1.0",
       "npm:mobx-react@^9.2.2",
       "npm:mobx@^6.16.1",
       "npm:react-dom@^18.3.1",
