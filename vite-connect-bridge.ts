@@ -15,6 +15,25 @@ class MockSocket extends Duplex {
   }
 }
 
+async function webRequestToIncomingMessage(
+  request: Request,
+): Promise<http.IncomingMessage> {
+  const socket = new MockSocket() as unknown as Socket;
+  const req = new http.IncomingMessage(socket);
+
+  const url = new URL(request.url);
+  req.url = url.pathname + url.search;
+  req.method = request.method;
+  req.headers = Object.fromEntries(request.headers);
+
+  if (request.body && !["GET", "HEAD"].includes(request.method)) {
+    req.push(Buffer.from(await request.arrayBuffer()));
+  }
+  req.push(null);
+
+  return req;
+}
+
 export function connectToWeb(
   middleware: Connect.Server,
 ): (request: Request) => Promise<Response> {
@@ -23,18 +42,7 @@ export function connectToWeb(
     const { promise, resolve, reject } = Promise.withResolvers<Response>();
 
     try {
-      const socket = new MockSocket() as unknown as Socket;
-      const req = new http.IncomingMessage(socket);
-
-      const url = new URL(request.url);
-      req.url = url.pathname + url.search;
-      req.method = request.method;
-      req.headers = Object.fromEntries(request.headers);
-
-      if (request.body && !["GET", "HEAD"].includes(request.method)) {
-        req.push(Buffer.from(await request.arrayBuffer()));
-      }
-      req.push(null);
+      const req = await webRequestToIncomingMessage(request);
 
       const res = new http.ServerResponse(req);
       let settled = false;
