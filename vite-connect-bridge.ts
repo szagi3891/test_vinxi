@@ -1,7 +1,7 @@
 import http from "node:http";
 import type { Socket } from "node:net";
 import { Duplex } from "node:stream";
-import type { Connect } from "vite";
+// import type { Connect } from "vite";
 
 class MockSocket extends Duplex {
   constructor() {
@@ -47,8 +47,69 @@ function nodeHeadersToWebHeaders(headers: http.OutgoingHttpHeaders): Headers {
   return webHeaders;
 }
 
+function createCapturingServerResponse(
+  req: http.IncomingMessage,
+  onResponse: (response: Response) => void,
+): { res: http.ServerResponse; settle: (response: Response) => void } {
+  const res = new http.ServerResponse(req);
+  let settled = false;
+
+  const chunks: Buffer[] = [];
+  let statusCode = 200;
+
+  const settle = (response: Response) => {
+    if (settled) return;
+    settled = true;
+    onResponse(response);
+  };
+
+  res.writeHead = function (
+    code: number,
+    reasonOrHeaders?: string | http.OutgoingHttpHeaders,
+    maybeHeaders?: http.OutgoingHttpHeaders,
+  ) {
+    statusCode = code;
+    if (typeof reasonOrHeaders === "object" && reasonOrHeaders) {
+      for (const [key, value] of Object.entries(reasonOrHeaders)) {
+        if (value != null) res.setHeader(key, value);
+      }
+    } else if (maybeHeaders) {
+      for (const [key, value] of Object.entries(maybeHeaders)) {
+        if (value != null) res.setHeader(key, value);
+      }
+    }
+    return res;
+  } as typeof res.writeHead;
+
+  res.write = function (chunk: unknown) {
+    if (chunk) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
+    }
+    return true;
+  } as typeof res.write;
+
+  res.end = function (chunk?: unknown) {
+    if (settled) return res;
+
+    if (chunk) {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
+    }
+
+    settle(
+      new Response(chunks.length ? Buffer.concat(chunks) : null, {
+        status: statusCode || res.statusCode,
+        headers: nodeHeadersToWebHeaders(res.getHeaders()),
+      }),
+    );
+    return res;
+  } as typeof res.end;
+
+  return { res, settle };
+}
+
 export function connectToWeb(
-  middleware: Connect.Server,
+  // middleware: Connect.Server,
+  middleware: (req: http.IncomingMessage, res: http.ServerResponse, next?: Function) => void,
 ): (request: Request) => Promise<Response> {
   return async (request: Request) => {
 
@@ -56,61 +117,10 @@ export function connectToWeb(
 
     try {
       const req = await webRequestToIncomingMessage(request);
-
-      const res = new http.ServerResponse(req);
-      let settled = false;
-
-      const chunks: Buffer[] = [];
-      let statusCode = 200;
-
-      res.writeHead = function (
-        code: number,
-        reasonOrHeaders?: string | http.OutgoingHttpHeaders,
-        maybeHeaders?: http.OutgoingHttpHeaders,
-      ) {
-        statusCode = code;
-        if (typeof reasonOrHeaders === "object" && reasonOrHeaders) {
-          for (const [key, value] of Object.entries(reasonOrHeaders)) {
-            if (value != null) res.setHeader(key, value);
-          }
-        } else if (maybeHeaders) {
-          for (const [key, value] of Object.entries(maybeHeaders)) {
-            if (value != null) res.setHeader(key, value);
-          }
-        }
-        return res;
-      } as typeof res.writeHead;
-
-      res.write = function (chunk: unknown) {
-        if (chunk) {
-          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
-        }
-        return true;
-      } as typeof res.write;
-
-      res.end = function (chunk?: unknown) {
-        if (settled) return res;
-        settled = true;
-
-        if (chunk) {
-          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
-        }
-
-        const headers = nodeHeadersToWebHeaders(res.getHeaders());
-
-        resolve(
-          new Response(chunks.length ? Buffer.concat(chunks) : null, {
-            status: statusCode || res.statusCode,
-            headers,
-          }),
-        );
-        return res;
-      } as typeof res.end;
+      const { res, settle } = createCapturingServerResponse(req, resolve);
 
       middleware(req, res, () => {
-        if (settled) return;
-        settled = true;
-        resolve(new Response("Not Found", { status: 404 }));
+        settle(new Response("Not Found", { status: 404 }));
       });
     } catch (error) {
       reject(error);
