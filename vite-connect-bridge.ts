@@ -47,6 +47,15 @@ function nodeHeadersToWebHeaders(headers: http.OutgoingHttpHeaders): Headers {
   return webHeaders;
 }
 
+function withNoCacheHeaders(headers: Headers): Headers {
+  if (!headers.has("cache-control")) {
+    headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
+  }
+  return headers;
+}
+
 function createCapturingServerResponse(
   req: http.IncomingMessage,
   onResponse: (response: Response) => void,
@@ -98,7 +107,7 @@ function createCapturingServerResponse(
     settle(
       new Response(chunks.length ? Buffer.concat(chunks) : null, {
         status: statusCode || res.statusCode,
-        headers: nodeHeadersToWebHeaders(res.getHeaders()),
+        headers: withNoCacheHeaders(nodeHeadersToWebHeaders(res.getHeaders())),
       }),
     );
     return res;
