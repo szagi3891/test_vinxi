@@ -67,9 +67,10 @@ function createCapturingServerResponse(
   let statusCode = 200;
 
   const settle = (response: Response) => {
-    if (settled) return;
-    settled = true;
-    onResponse(response);
+    if (settled === false) {
+      settled = true;
+      onResponse(response);
+    }
   };
 
   res.writeHead = function (
