@@ -34,6 +34,19 @@ async function webRequestToIncomingMessage(
   return req;
 }
 
+function nodeHeadersToWebHeaders(headers: http.OutgoingHttpHeaders): Headers {
+  const webHeaders = new Headers();
+  for (const [key, value] of Object.entries(headers)) {
+    if (value == null) continue;
+    if (Array.isArray(value)) {
+      for (const item of value) webHeaders.append(key, String(item));
+    } else {
+      webHeaders.set(key, String(value));
+    }
+  }
+  return webHeaders;
+}
+
 export function connectToWeb(
   middleware: Connect.Server,
 ): (request: Request) => Promise<Response> {
@@ -83,15 +96,7 @@ export function connectToWeb(
           chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
         }
 
-        const headers = new Headers();
-        for (const [key, value] of Object.entries(res.getHeaders())) {
-          if (value == null) continue;
-          if (Array.isArray(value)) {
-            for (const item of value) headers.append(key, String(item));
-          } else {
-            headers.set(key, String(value));
-          }
-        }
+        const headers = nodeHeadersToWebHeaders(res.getHeaders());
 
         resolve(
           new Response(chunks.length ? Buffer.concat(chunks) : null, {
