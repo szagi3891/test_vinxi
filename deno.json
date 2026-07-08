@@ -2,9 +2,9 @@
   "nodeModulesDir": "auto",
   "imports": {
     "react": "npm:react@^19.2.7",
-    "react/jsx-runtime": "npm:react@^18.3.1/jsx-runtime",
+    "react/jsx-runtime": "npm:react@^19.2.7/jsx-runtime",
     "react-dom": "npm:react-dom@^19.2.7",
-    "react-dom/client": "npm:react-dom@^18.3.1/client",
+    "react-dom/client": "npm:react-dom@^19.2.7/client",
     "mobx": "npm:mobx@^6.16.1",
     "mobx-react": "npm:mobx-react@^9.2.2",
     "vinxi": "npm:vinxi@^0.5.11",
