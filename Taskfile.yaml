@@ -80,7 +80,7 @@ tasks:
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
     cmds:
-      - deno check app.config.ts app-desktop.config.ts createApp.ts vite.config.ts src/ src_desktop/ src_vite/api-routes.ts src_vite/connect-bridge.ts src_vite/request-handler.ts src_vite/entry-dev-server.ts src_vite/entry-prod-server.ts src_vite/entry-client/
+      - deno check app.config.ts app-desktop.config.ts createApp.ts vite.config.ts src/ src_desktop/ src_vite/api-routes.ts src_vite/request-handler.ts src_vite/entry-dev-server.ts src_vite/entry-prod-server.ts src_vite/entry-client/
 
   install:
     desc: Instaluje zależności npm przez Deno

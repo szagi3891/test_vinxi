@@ -1,3 +1,4 @@
+import deno from "@deno/vite-plugin";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { resolve } from "node:path";
@@ -17,11 +18,28 @@ function clientOnly(plugin: Plugin | Plugin[]): Plugin[] {
   }));
 }
 
+function serverOnly(plugin: Plugin | Plugin[]): Plugin[] {
+  const plugins = Array.isArray(plugin) ? plugin : [plugin];
+  return plugins.map((item) => ({
+    ...item,
+    applyToEnvironment(env) {
+      if (env.name !== "server") return false;
+      const applied = item.applyToEnvironment?.(env);
+      if (applied === false) return false;
+      return applied ?? true;
+    },
+  }));
+}
+
 export default defineConfig({
   root: "./src_vite",
   cacheDir: "../node_modules/.vite",
   builder: {},
-  plugins: [...clientOnly(react()), ...clientOnly(tailwindcss())],
+  plugins: [
+    ...serverOnly(deno()),
+    ...clientOnly(react()),
+    ...clientOnly(tailwindcss()),
+  ],
   environments: {
     client: {
       build: {
