@@ -69,14 +69,6 @@ tasks:
     cmds:
       - deno run -A npm:vite build --config vite.config.ts --app
 
-  vite-preview:
-    desc: Podgląd buildu Vite (wymaga vite-build)
-    env:
-      PORT: 4173
-    cmds:
-      - deno run -A dist_vite/server/index.mjs
-    interactive: true
-
   vite-start:
     desc: Uruchamia zbudowany serwer z dist_vite/ (wymaga vite-build)
     env:
