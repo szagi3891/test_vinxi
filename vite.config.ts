@@ -8,25 +8,12 @@ import { defineConfig, type Plugin } from "vite";
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 const serverEntry = resolve(rootDir, "src_vite/entry-prod-server.ts");
 
-function clientOnly(plugin: Plugin | Plugin[]): Plugin[] {
+function onlyEnv(envName: string, plugin: Plugin | Plugin[]): Plugin[] {
   const plugins = Array.isArray(plugin) ? plugin : [plugin];
   return plugins.map((item) => ({
     ...item,
     applyToEnvironment(env) {
-      return env.name === "client";
-    },
-  }));
-}
-
-function serverOnly(plugin: Plugin | Plugin[]): Plugin[] {
-  const plugins = Array.isArray(plugin) ? plugin : [plugin];
-  return plugins.map((item) => ({
-    ...item,
-    applyToEnvironment(env) {
-      if (env.name !== "server") return false;
-      const applied = item.applyToEnvironment?.(env);
-      if (applied === false) return false;
-      return applied ?? true;
+      return env.name === envName;
     },
   }));
 }
@@ -36,9 +23,9 @@ export default defineConfig({
   cacheDir: "../node_modules/.vite",
   builder: {},
   plugins: [
-    ...serverOnly(deno()),
-    ...clientOnly(react()),
-    ...clientOnly(tailwindcss()),
+    ...onlyEnv("server", deno()),
+    ...onlyEnv('client', react()),
+    ...onlyEnv('client', tailwindcss()),
   ],
   environments: {
     client: {
