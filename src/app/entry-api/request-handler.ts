@@ -1,3 +1,4 @@
+import { handleOrpcFetch } from "./orpc/handler.ts";
 import { handleApiFetch } from "./routes.ts";
 
 export function handleWebSocket(request: Request): Response {
@@ -32,6 +33,11 @@ export function createRequestHandler(option: {
       }
 
       return handleWebSocket(request);
+    }
+
+    const orpcResponse = await handleOrpcFetch(request);
+    if (orpcResponse) {
+      return orpcResponse;
     }
 
     const apiResponse = await handleApiFetch(request);

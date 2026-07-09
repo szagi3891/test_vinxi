@@ -5,6 +5,7 @@ import { appStore } from "./appStore";
 const App = observer(function App() {
   useEffect(() => {
     void appStore.loadHealth();
+    void appStore.loadOrpcGreeting();
     appStore.connectWs();
     return () => appStore.disconnectWs();
   }, []);
@@ -27,6 +28,12 @@ const App = observer(function App() {
           : appStore.api
             ? `${appStore.api.status} @ ${appStore.api.time}`
             : "ładowanie…"}
+      </p>
+      <p className="text-sm text-slate-500">
+        oRPC:{" "}
+        {appStore.orpcError
+          ? `błąd (${appStore.orpcError})`
+          : appStore.orpcGreeting ?? "ładowanie…"}
       </p>
 
       <section className="space-y-2 border-t border-slate-200 pt-4">

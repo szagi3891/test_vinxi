@@ -1,4 +1,5 @@
 import { makeAutoObservable } from "mobx";
+import { orpc } from "./orpc-client.ts";
 
 export type ApiResponse = {
   status: string;
@@ -11,6 +12,8 @@ class AppStore {
   count = 0;
   api: ApiResponse | null = null;
   apiError: string | null = null;
+  orpcGreeting: string | null = null;
+  orpcError: string | null = null;
   wsStatus: WsStatus = "idle";
   wsLastMessage: string | null = null;
   wsInput = "";
@@ -32,6 +35,15 @@ class AppStore {
       this.api = (await res.json()) as ApiResponse;
     } catch (err) {
       this.apiError = err instanceof Error ? err.message : "Unknown error";
+    }
+  }
+
+  async loadOrpcGreeting() {
+    try {
+      const result = await orpc.greet({ name: "React" });
+      this.orpcGreeting = result.message;
+    } catch (err) {
+      this.orpcError = err instanceof Error ? err.message : "Unknown error";
     }
   }
 
