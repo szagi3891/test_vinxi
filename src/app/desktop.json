@@ -2,7 +2,7 @@
   "desktop": {
     "app": {
       "name": "Test Vinxi",
-      "identifier": "com.test.vinxi-desktop"
+      "identifier": "com.test.test-vinxi.app"
     }
   }
 }
