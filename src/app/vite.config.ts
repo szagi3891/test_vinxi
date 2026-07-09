@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
-const serverEntry = resolve(rootDir, "src_vite/entry-prod-server.ts");
+const serverEntry = resolve(rootDir, "server-prod.ts");
 
 function onlyEnv(envName: string, plugin: Plugin | Plugin[]): Plugin[] {
   const plugins = Array.isArray(plugin) ? plugin : [plugin];
@@ -19,18 +19,18 @@ function onlyEnv(envName: string, plugin: Plugin | Plugin[]): Plugin[] {
 }
 
 export default defineConfig({
-  root: "./src_vite",
-  cacheDir: "../node_modules/.vite",
+  root: rootDir,
+  cacheDir: "../../node_modules/.vite",
   builder: {},
   plugins: [
     ...onlyEnv("server", deno()),
-    ...onlyEnv('client', react()),
-    ...onlyEnv('client', tailwindcss()),
+    ...onlyEnv("client", react()),
+    ...onlyEnv("client", tailwindcss()),
   ],
   environments: {
     client: {
       build: {
-        outDir: "../dist_vite/client",
+        outDir: "../../dist/app/client",
         emptyOutDir: true,
       },
     },
@@ -39,7 +39,7 @@ export default defineConfig({
         noExternal: true,
       },
       build: {
-        outDir: "../dist_vite/server",
+        outDir: "../../dist/app/server",
         emptyOutDir: true,
         rollupOptions: {
           input: serverEntry,

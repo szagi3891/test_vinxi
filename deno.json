@@ -7,7 +7,6 @@
     "react-dom/client": "npm:react-dom@^19.2.7/client",
     "mobx": "npm:mobx@^6.16.1",
     "mobx-react": "npm:mobx-react@^9.2.2",
-    "vinxi": "npm:vinxi@^0.5.11",
     "vinxi/http": "npm:vinxi@^0.5.11/http",
     "@vitejs/plugin-react": "npm:@vitejs/plugin-react@^6.0.3",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.3.2",

@@ -1,86 +1,30 @@
 version: "3"
 
 tasks:
-  dev:
-    desc: Uruchamia serwer deweloperski (HMR)
-    cmds:
-      - deno run -A npm:vinxi dev --config app.config.ts
-    interactive: true
-
-  build:
-    desc: Buduje projekt do produkcji
-    cmds:
-      - deno run -A npm:vinxi build --config app.config.ts
-
-  start:
-    desc: Uruchamia zbudowaną aplikację (wymaga wcześniejszego build)
-    cmds:
-      - deno run -A npm:vinxi start --config app.config.ts
-    interactive: true
-
-  start-static:
-    desc: Uruchamia build bezpośrednio przez Deno (wymaga wcześniejszego build)
-    env:
-      NODE_ENV: production
-    cmds:
-      - deno run -A .output/server/index.mjs
-    interactive: true
-
-  desktop-dev:
-    desc: Uruchamia serwer deweloperski desktop (HMR, src_desktop)
-    cmds:
-      - deno run -A npm:vinxi dev --config app-desktop.config.ts
-    interactive: true
-
-  desktop-build:
-    desc: Buduje wersję desktop do produkcji
-    cmds:
-      - deno run -A npm:vinxi build --config app-desktop.config.ts
-
-  desktop-start:
-    desc: Uruchamia zbudowaną aplikację desktop (wymaga desktop-build)
-    cmds:
-      - deno run -A npm:vinxi start --config app-desktop.config.ts
-    interactive: true
-
-  desktop-start-static:
-    desc: Uruchamia build desktop bezpośrednio przez Deno (wymaga desktop-build)
-    env:
-      NODE_ENV: production
-    cmds:
-      - deno run -A .output/server/index.mjs
-    interactive: true
-
-  desktop-build-image:
-    desc: Buduje binarną aplikację desktop (wymaga desktop-build)
-    deps:
-      - desktop-build
-    cmds:
-      - deno desktop -A --no-check --include .output .output/server/index.mjs
 
   vite-dev:
-    desc: Uruchamia serwer deweloperski Vite (HMR, src_vite)
+    desc: Uruchamia serwer deweloperski Vite (HMR, src/app)
     cmds:
-      - deno run -A src_vite/entry-dev-server.ts
+      - deno run -A src/app/server-dev.ts
     interactive: true
 
   vite-build:
-    desc: Buduje wersję Vite do produkcji (dist_vite/client + dist_vite/server)
+    desc: Buduje wersję Vite do produkcji (dist/app/client + dist/app/server)
     cmds:
-      - deno run -A npm:vite build --config vite.config.ts --app
+      - deno run -A npm:vite build --config src/app/vite.config.ts --app
 
   vite-start:
-    desc: Uruchamia zbudowany serwer z dist_vite/ (wymaga vite-build)
+    desc: Uruchamia zbudowany serwer z dist/app/ (wymaga vite-build)
     env:
       NODE_ENV: production
     cmds:
-      - deno run -A dist_vite/server/index.mjs
+      - deno run -A dist/app/server/index.mjs
     interactive: true
 
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
     cmds:
-      - deno check app.config.ts app-desktop.config.ts createApp.ts vite.config.ts src/ src_desktop/ src_vite/api-routes.ts src_vite/request-handler.ts src_vite/entry-dev-server.ts src_vite/entry-prod-server.ts src_vite/entry-client/
+      - deno check app.config.ts app-desktop.config.ts createApp.ts src/app/ src_desktop/
 
   install:
     desc: Instaluje zależności npm przez Deno
