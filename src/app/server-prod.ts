@@ -13,6 +13,8 @@ const index = await Deno.readFile(clientIndex.pathname);
 const indexText = new TextDecoder().decode(index);
 console.info('indexText', indexText);
 
+console.info("env", Deno.env.toObject());
+
 async function serveStatic(request: Request): Promise<Response> {
     console.info('request url', request.url);
 
@@ -30,5 +32,10 @@ async function serveStatic(request: Request): Promise<Response> {
 
 const handleRequest = createRequestHandler({ fallback: serveStatic });
 
-console.log(`Production server: http://localhost:${port}`);
-Deno.serve({ port }, handleRequest);
+if (Deno.env.get("DENO_SERVE_ADDRESS")) {
+  console.log("Desktop server:", Deno.env.get("DENO_SERVE_ADDRESS"));
+  Deno.serve(handleRequest);
+} else {
+  console.log(`Production server: http://localhost:${port}`);
+  Deno.serve({ port }, handleRequest);
+}
