@@ -26,14 +26,21 @@ tasks:
     deps:
       - vite-build
     cmds:
-      - deno desktop -A --no-check --include dist/app dist/app/server/index.mjs
+      - >-
+        deno desktop
+        -c src/app/desktop.json
+        -A
+        --no-check
+        -o ./dist/app.app
+        --include dist/app
+        dist/app/server/index.mjs
 
   desktop-run-debug:
     desc: Uruchamia zbudowaną aplikację desktop z logami w konsoli
     deps:
       - desktop-build
     cmds:
-      - task desktop-build && ./dist/vinxi-desktop.app/Contents/MacOS/laufey_webview
+      - ./dist/app.app/Contents/MacOS/laufey_webview
   
   # desktop-dev:
   #   desc: Uruchamia aplikację desktop w trybie dev (okno + HMR)
