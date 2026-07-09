@@ -13,7 +13,7 @@ const port = 3000;
 // const indexText = new TextDecoder().decode(index);
 // console.info('indexText', indexText);
 
-// console.info("env", Deno.env.toObject());
+// console.info("env", JSON.stringify(Deno.env.toObject(), null, 2));
 
 async function serveStatic(request: Request): Promise<Response> {
     console.info('request url', request.url);
@@ -31,6 +31,8 @@ async function serveStatic(request: Request): Promise<Response> {
 }
 
 const handleRequest = createRequestHandler({ fallback: serveStatic });
+
+console.info('DENO_SERVE_ADDRESS => ', Deno.env.get("DENO_SERVE_ADDRESS"));
 
 // W trybie deno desktop runtime ustawia DENO_SERVE_ADDRESS i Deno.serve
 // wiąże się z tym adresem, ignorując podany port.
