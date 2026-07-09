@@ -24,27 +24,29 @@ export function handleWebSocket(request: Request): Response {
 export function createRequestHandler(option: {
   fallback: (request: Request) => Promise<Response>,
 }) {
-  return async (request: Request): Promise<Response> => {
-    const url = new URL(request.url);
+    return async (request: Request): Promise<Response> => {
+        console.info('createRequestHandler request url', request.url);
 
-    if (url.pathname === "/_ws") {
-      if (request.headers.get("upgrade")?.toLowerCase() !== "websocket") {
-        return new Response("Expected WebSocket", { status: 426 });
-      }
+        const url = new URL(request.url);
 
-      return handleWebSocket(request);
-    }
+        if (url.pathname === "/_ws") {
+            if (request.headers.get("upgrade")?.toLowerCase() !== "websocket") {
+                return new Response("Expected WebSocket", { status: 426 });
+            }
 
-    const orpcResponse = await handleOrpcFetch(request);
-    if (orpcResponse) {
-      return orpcResponse;
-    }
+            return handleWebSocket(request);
+        }
 
-    const apiResponse = await handleApiFetch(request);
-    if (apiResponse) {
-      return apiResponse;
-    }
+        const orpcResponse = await handleOrpcFetch(request);
+        if (orpcResponse) {
+            return orpcResponse;
+        }
 
-    return option.fallback(request);
-  };
+        const apiResponse = await handleApiFetch(request);
+        if (apiResponse) {
+            return apiResponse;
+        }
+
+        return option.fallback(request);
+    };
 }

@@ -14,16 +14,18 @@ const indexText = new TextDecoder().decode(index);
 console.info('indexText', indexText);
 
 async function serveStatic(request: Request): Promise<Response> {
-  const response = await serveDir(request, {
-    fsRoot: clientDist.pathname,
-    quiet: true,
-  });
+    console.info('request url', request.url);
 
-  if (response.status === 404) {
-    return serveFile(request, clientIndex.pathname);
-  }
+    const response = await serveDir(request, {
+        fsRoot: clientDist.pathname,
+        quiet: true,
+    });
 
-  return response;
+    if (response.status === 404) {
+        return serveFile(request, clientIndex.pathname);
+    }
+
+    return response;
 }
 
 const handleRequest = createRequestHandler({ fallback: serveStatic });
