@@ -21,12 +21,6 @@ tasks:
       - deno run -A dist/app/server/index.mjs
     interactive: true
 
-  desktop-dev:
-    desc: Uruchamia aplikację desktop w trybie dev (okno + HMR)
-    cmds:
-      - deno desktop --hmr -A src/app/server-dev.ts
-    interactive: true
-
   desktop-build:
     desc: Buduje aplikację desktop (.app na macOS, wymaga vite-build)
     deps:
@@ -34,11 +28,24 @@ tasks:
     cmds:
       - deno desktop -A --no-check --include dist/app dist/app/server/index.mjs
 
-  desktop-run:
-    desc: Uruchamia zbudowaną aplikację desktop (wymaga desktop-build)
+  desktop-run-debug:
+    desc: Uruchamia zbudowaną aplikację desktop z logami w konsoli
+    deps:
+      - desktop-build
     cmds:
-      - open dist/vinxi-desktop.app
-    interactive: true
+      - task desktop-build && ./dist/vinxi-desktop.app/Contents/MacOS/vinxi-desktop
+  
+  # desktop-dev:
+  #   desc: Uruchamia aplikację desktop w trybie dev (okno + HMR)
+  #   cmds:
+  #     - deno desktop --hmr -A src/app/server-dev.ts
+  #   interactive: true
+
+  # desktop-run:
+  #   desc: Uruchamia zbudowaną aplikację desktop (wymaga desktop-build)
+  #   cmds:
+  #     - open dist/vinxi-desktop.app
+  #   interactive: true
 
   typecheck:
     desc: Sprawdza typy TypeScript w całym projekcie
