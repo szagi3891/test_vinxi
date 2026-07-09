@@ -1,6 +1,7 @@
 import { serveDir, serveFile } from "@std/http/file-server";
 import { createRequestHandler } from "./entry-api/request-handler.ts";
 
+console.info('import.meta.url', import.meta.url);
 const clientDist = new URL("../client/", import.meta.url);
 const clientIndex = new URL("../client/index.html", import.meta.url);
 const port = 3000;
