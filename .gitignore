@@ -7,4 +7,3 @@ dist/
 dist_vite/
 
 .DS_Store
-src_desktop/node_modules/

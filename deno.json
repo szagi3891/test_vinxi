@@ -1,4 +1,5 @@
 {
+  "name": "test-vinxi",
   "nodeModulesDir": "auto",
   "imports": {
     "@orpc/client": "npm:@orpc/client@^1.14.7",
@@ -33,7 +34,7 @@
   },
   "desktop": {
     "app": {
-      "name": "Vinxi Desktop POC",
+      "name": "Test Vinxi",
       "identifier": "com.test.vinxi-desktop"
     },
     "output": {
