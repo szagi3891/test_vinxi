@@ -33,7 +33,7 @@ tasks:
     deps:
       - desktop-build
     cmds:
-      - task desktop-build && ./dist/vinxi-desktop.app/Contents/MacOS/vinxi-desktop
+      - task desktop-build && ./dist/vinxi-desktop.app/Contents/MacOS/laufey_webview
   
   # desktop-dev:
   #   desc: Uruchamia aplikację desktop w trybie dev (okno + HMR)

@@ -32,9 +32,11 @@ async function serveStatic(request: Request): Promise<Response> {
 
 const handleRequest = createRequestHandler({ fallback: serveStatic });
 
-if (Deno.env.get("DENO_SERVE_ADDRESS")) {
-  console.log("Desktop server:", Deno.env.get("DENO_SERVE_ADDRESS"));
-  Deno.serve(handleRequest);
+const serveAddress = Deno.env.get("DENO_SERVE_ADDRESS");
+if (serveAddress) {
+  const desktopPort = Number(serveAddress.split(":").at(-1));
+  console.log("Desktop server:", serveAddress);
+  Deno.serve({ hostname: "127.0.0.1", port: desktopPort }, handleRequest);
 } else {
   console.log(`Production server: http://localhost:${port}`);
   Deno.serve({ port }, handleRequest);
