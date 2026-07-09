@@ -13,7 +13,12 @@ export const greet = os
     message: `Cześć, ${input.name}!`,
   }));
 
+export const devtools = os.handler(async () => {
+  return { ok: true };
+});
+
 export const router = {
   health,
   greet,
+  devtools,
 };

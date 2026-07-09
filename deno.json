@@ -29,7 +29,7 @@
     "strict": true,
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "lib": ["ESNext", "DOM", "DOM.Iterable", "deno.ns"],
+    "lib": ["deno.desktop", "deno.ns", "ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext"
   }
 }

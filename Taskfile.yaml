@@ -21,7 +21,7 @@ tasks:
       - deno run -A dist/app/server/index.mjs
     interactive: true
 
-  desktop-build:
+  desktop-default-build:
     desc: Buduje aplikację desktop (.app na macOS, wymaga vite-build)
     deps:
       - vite-build
@@ -35,13 +35,38 @@ tasks:
         --include dist/app
         dist/app/server/index.mjs
 
-  desktop-run-debug:
+  desktop-default-run-debug:
     desc: Uruchamia zbudowaną aplikację desktop z logami w konsoli
     deps:
-      - desktop-build
+      - desktop-default-build
     cmds:
       - ./dist/app.app/Contents/MacOS/laufey_webview
   
+  
+
+  desktop-chome-build:
+    desc: Buduje aplikację desktop (.app na macOS, wymaga vite-build)
+    deps:
+      - vite-build
+    cmds:
+      - >-
+        deno desktop
+        -c src/app/desktop.json
+        -A
+        --no-check
+        --backend cef
+        -o ./dist/app.app
+        --include dist/app
+        dist/app/server/index.mjs
+
+  desktop-chome-run-debug:
+    desc: Uruchamia zbudowaną aplikację desktop z logami w konsoli
+    deps:
+      - desktop-chome-build
+    cmds:
+      - ./dist/app.app/Contents/MacOS/laufey
+
+
   # desktop-dev:
   #   desc: Uruchamia aplikację desktop w trybie dev (okno + HMR)
   #   cmds:
