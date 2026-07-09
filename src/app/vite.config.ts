@@ -38,6 +38,12 @@ export default defineConfig({
       resolve: {
         noExternal: true,
       },
+      // Zbundlowane moduły (np. @std/http/file-server) mają bloki
+      // `if (import.meta.main) main()`, które po bundlingu odpaliłyby się
+      // w pliku wyjściowym — wyłączamy je na stałe.
+      define: {
+        "import.meta.main": "false",
+      },
       build: {
         outDir: "../../dist/app/server",
         emptyOutDir: true,
