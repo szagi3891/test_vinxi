@@ -8,13 +8,26 @@ import { defineConfig, type Plugin } from "vite";
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 const serverEntry = resolve(rootDir, "server-prod.ts");
 
+// function onlyEnv(envName: string, plugin: Plugin | Plugin[]): Plugin[] {
+//   const plugins = Array.isArray(plugin) ? plugin : [plugin];
+//   return plugins.map((item) => ({
+//     ...item,
+//     applyToEnvironment(env) {
+//       return env.name === envName;
+//     },
+//   }));
+// }
+
+// Uwaga: applyToEnvironment bywa fabryką zwracającą plugin dla danego środowiska
+// (np. vite:react:refresh-wrapper tak dostarcza transform z hot.accept dla HMR),
+// dlatego oryginalny hook trzeba skomponować, a nie nadpisać zwykłym booleanem.
 function onlyEnv(envName: string, plugin: Plugin | Plugin[]): Plugin[] {
-  const plugins = Array.isArray(plugin) ? plugin : [plugin];
-  return plugins.map((item) => ({
-    ...item,
-    applyToEnvironment(env) {
-      return env.name === envName;
-    },
+  return [plugin].flat().map((item) => ({
+      ...item,
+      applyToEnvironment(env) {
+          if (env.name !== envName) return false;
+          return item.applyToEnvironment?.call(this, env) ?? true;
+      },
   }));
 }
 
@@ -23,9 +36,9 @@ export default defineConfig({
   cacheDir: "../../node_modules/.vite",
   builder: {},
   plugins: [
-    ...onlyEnv("server", deno()),
-    ...onlyEnv("client", react()),
-    ...onlyEnv("client", tailwindcss()),
+    onlyEnv("server", deno()),
+    onlyEnv("client", react()),
+    onlyEnv("client", tailwindcss()),
   ],
   environments: {
     client: {
